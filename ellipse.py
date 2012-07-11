@@ -50,3 +50,11 @@ def lincomb(waa, u, v):
         vectors.append(y)
         k +=1
     return np.array(vectors)
+
+def make_int(array):
+
+    rownums, colnums = range(len(array)), range(len(array[0]))
+    for i in rownums:
+        for j in colnums:
+            array[i][j] = int(array[i][j])
+    return array
