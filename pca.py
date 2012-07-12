@@ -19,7 +19,7 @@ def recover_basis(data):
 
 
 
-def encode_data(data, new_basis):
+def encode_data(data):
     """This function takes in your data matrix and its
     dimension-reduced basis and displays the projection of the
     original data on said basis in lower-dimensional space."""
@@ -28,7 +28,7 @@ def encode_data(data, new_basis):
     new_basis = recover_basis(data)
     Y = mp.mult(cent_data, new_basis)
 
-    return Y
+    return np.array(Y)
 
 
 

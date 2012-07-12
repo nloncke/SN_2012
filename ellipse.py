@@ -30,15 +30,15 @@ def deg_ellipse(x_axis, y_axis, degrees):
     x, y = rect_ellipse(x_axis, y_axis, theta)
     return x, y
 
-# def ellipse_pts(x_axis, y_axis, step=py.pi/6):
-#     """Returns a list of points on an ellipse of semimajor/semiminor
-#     axes of length x_axis and y_axis in increments of the given step
-#     size."""
+def ellipse_pts(x_axis, y_axis, step=py.pi/6):
+    """Returns a list of points on an ellipse of semimajor/semiminor
+    axes of length x_axis and y_axis in increments of the given step
+    size."""
 
-#     degrees = arange(0, 2*py.pi, step)
-#     rect_coords = rect_ellipse(x_axis, y_axis, degrees)
-#     rect_coords = zip(rect_coords[0], rect_coords[1])
-#     return rect_coords
+    degrees = np.arange(0, 2*py.pi, step)
+    rect_coords = rect_ellipse(x_axis, y_axis, degrees)
+    rect_coords = zip(rect_coords[0], rect_coords[1])
+    return np.array(rect_coords)
 
 def lincomb(waa, u, v):
 
@@ -51,8 +51,8 @@ def lincomb(waa, u, v):
         k +=1
     return np.array(vectors)
 
-def make_int(array):
 
+def make_int(array):
     rownums, colnums = range(len(array)), range(len(array[0]))
     for i in rownums:
         for j in colnums:
