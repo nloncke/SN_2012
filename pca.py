@@ -41,3 +41,16 @@ def reconstruct_data(data, new_basis):
     recon_data = mp.mult(Y, new_basis.T)
 
     return np.array(recon_data)
+
+
+def whiten(mtx):
+    """Calculates the average of the columns of a matrix and then
+    subtracts..."""
+
+    whitened_ellipse = []
+    i = 0
+    while i < 3:
+        mtx_mean = np.mean(mtx.T[i])
+        whitened_ellipse = whitened_ellipse.append(mtx.T[i] - np.mean(mtx.T[i], out=array))
+        i+1
+    return whitened_ellipse

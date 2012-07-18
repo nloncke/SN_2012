@@ -3,7 +3,8 @@ format.  Splits all data into an array of the day #s, wavelength values,
 and flux data per day. Plots the flux values vs. wavelength for any
 given day."""
 
-import pylab as plt
+import matplotlib.mlab
+import matplotlib.pyplot as plt
 import numpy as np
 
 def process_data(filename):
@@ -24,6 +25,18 @@ def process_data(filename):
                                 ## spectra values per day in order of
                                 ## increasing wavelength
     return dayarr, lams, specs
+
+
+def whiten(arr):
+    """Given an array, calculate the mean by columns.  Return the mean
+    matrix and then the zero-meaned matrix."""
+    
+    col_avg = np.zeros(arr.shape)
+    for i in range(len(arr)):
+        col_avg[i] = np.mean(arr, axis=0)
+    whitened_arr = arr - col_avg
+
+    return col_avg, whitened_arr
 
 
 def day_idx(day,dayarr):
@@ -89,7 +102,7 @@ def svd_specs(filename):
     def call_processdata(filename):
         return process_data(filename)
     days, lams, specs = process_data(filename)
-    zspecs = plt.center_matrix(specs)
+    zspecs = mlab.center_matrix(specs)
     U, S, V = np.linalg.svd(zspecs)
     return U, S, V
 
