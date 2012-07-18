@@ -106,6 +106,16 @@ def svd_specs(filename):
     U, S, V = np.linalg.svd(zspecs)
     return U, S, V
 
+def ratio(arr):
+    """Returns a matrix whose elements are the ratios of the input's
+    elements.  This is specifically to be used on the 0-dimensional
+    array of the singular values."""
+    
+    ratios = np.zeros((len(arr)-1,))
+    for i in range(len(arr)-1):
+        ratios[i-1] = (arr[i-1]/arr[i])
+    return ratios[:-1]
+
 # def pcs_specs(filename):
 #     def call_processdata(filename):
 #         return process_data(filename)
