@@ -3,7 +3,7 @@ format.  Splits all data into an array of the day #s, wavelength values,
 and flux data per day. Plots the flux values vs. wavelength for any
 given day."""
 
-import matplotlib.mlab
+import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -115,6 +115,38 @@ def ratio(arr):
     for i in range(len(arr)-1):
         ratios[i-1] = (arr[i-1]/arr[i])
     return ratios[:-1]
+
+def plotcoeffs(coeffs, x_axis=None, y_axis=None):
+    """Generates plots for all of the coordinates against each other
+    and saves them in the format 'c{a}-c{b}.png'."""
+
+    i = 0
+    if x_axis is not None and y_axis is None:
+        while i < len(coeffs) and i!=x_axis:
+            plt.plot(coeffs[x_axis],coeffs[i])
+            plt.savefig('c{0}-c{1}.png'.format(x_axis, i))
+            plt.close()
+            i += 1
+    j = 0
+    if y_axis is not None and x_axis is None:
+        while j < len(coeffs) and j!=y_axis:
+            plt.plot(coeffs[j],coeffs[y_axis])
+            plt.savefig('c{0}-c{1}.png'.format(j, y_axis))
+            plt.close()
+            j += 1
+    (i,j) = (0,0)
+    if x_axis is None and y_axis is None:
+        while i < len(coeffs):
+            while j < len(coeffs) and i!=j:
+                plt.plot(coeffs[i],coeffs[j])
+                plt.savefig('c{0}-c{1}.png'.format(i, j))
+                plt.close()
+                j += 1
+            while i==j:
+                j += 1
+            i += 1
+    return 'Figures saved!'
+
 
 # def pcs_specs(filename):
 #     def call_processdata(filename):
