@@ -123,28 +123,25 @@ def plotcoeffs(coeffs, x_axis=None, y_axis=None):
     i = 0
     if x_axis is not None and y_axis is None:
         while i < len(coeffs) and i!=x_axis:
-            plt.plot(coeffs[x_axis],coeffs[i])
+            plt.plot(coeffs[x_axis],coeffs[i], 'o')
             plt.savefig('c{0}-c{1}.png'.format(x_axis, i))
             plt.close()
             i += 1
     j = 0
     if y_axis is not None and x_axis is None:
         while j < len(coeffs) and j!=y_axis:
-            plt.plot(coeffs[j],coeffs[y_axis])
+            plt.plot(coeffs[j],coeffs[y_axis], 'o')
             plt.savefig('c{0}-c{1}.png'.format(j, y_axis))
             plt.close()
             j += 1
     (i,j) = (0,0)
     if x_axis is None and y_axis is None:
-        while i < len(coeffs):
+        for i in range(len(coeffs)):
             while j < len(coeffs) and i!=j:
-                plt.plot(coeffs[i],coeffs[j])
+                plt.plot(coeffs[i],coeffs[j], 'o')
                 plt.savefig('c{0}-c{1}.png'.format(i, j))
                 plt.close()
                 j += 1
-            while i==j:
-                j += 1
-            i += 1
     return 'Figures saved!'
 
 
