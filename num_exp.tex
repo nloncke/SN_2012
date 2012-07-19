@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{amsmath}
 
 \begin{document}
 \section{Coding and things}
@@ -150,10 +151,13 @@ matrix A
 \item Cut out days -20 and -19, SVD the shit that's left, and then
   interpret the data outputs.  We should be finding the product of
   $U\Sigma$ in order to recover the coefficients of our samples with
-  respect to the new basis found in the columns of V.
-\item Plot $(True\_spec - Recovered\_Spec) \ Truespec$ for various
-  values of \textit{n}, where \textit{n} is the number of eigenvectors
-  we use to reconstruct our data.  This is the residual!
+  respect to the new basis found in the columns of V. \textbf{DONE.}
+\item Plot
+  \begin{math}
+    \frac{True spec - Recovered Spec}{Truespec}
+  \end{math}
+  for various values of \textit{n}, where \textit{n} is the number of
+  eigenvectors we use to reconstruct our data.  This is the residual!
 \item write a function that will tell us how many days we need in
   order to achieve a maximum residual tolerance of $10^{-3}$ or
   something like that.
@@ -165,8 +169,9 @@ matrix A
 \label{sec:ideas}
 
 We've gotten to the point where we understand the configuration of
-$U\Sigma$ pretty well, so we're on the interpreting step where we plot
-the coordinates against each other in ordered $(c_{1},c_{2})$ pairs.
+$U\Sigma$ pretty well, so we're up to the interpreting part.  To
+discover any underlying structure, we plot the coordinates produced by
+$U\Sigma$ against each other in ordered $(c_{1},c_{2})$ pairs.
 Now...I get why this is relevant, but I'm trying to put my
 understanding into words so I don't forget/realize that I don't
 actually know what I think I know.  Here goes!
@@ -176,6 +181,11 @@ vector (found in the columns of V) on different days.  If you were to
 plot the first two rows of the coefficient matrix against each other,
 so to speak, the first pair would represent the weighting of the first
 basis vector on the first day against the weighting of the same basis
-vector on the second day.
+vector on the second day, the second pair would give you the weights
+of the second vector on the first day and the second day, etc.
+
+In short, each coefficient row of $U$ contains the weights of all the
+vectors $\vec{v_{1}}, \vec{v_{2}},\ldots,\vec{v_{k}}$ found in the
+first $k$ rows of $V^{T}$.
 
 \end{document}
