@@ -119,6 +119,8 @@ def ratio(arr):
 def plotcoeffs(coeffs, x_axis=None, y_axis=None):
     """Generates plots for all of the coordinates against each other
     and saves them in the format 'c{a}-c{b}.png'."""
+# FYI: This function doesn't really work yet...  We need more
+# troubleshooting and Gabe-asking
 
     i = 0
     if x_axis is not None and y_axis is None:
@@ -136,13 +138,23 @@ def plotcoeffs(coeffs, x_axis=None, y_axis=None):
             j += 1
     (i,j) = (0,0)
     if x_axis is None and y_axis is None:
-        for i in range(len(coeffs)):
-            while j < len(coeffs) and i!=j:
-                plt.plot(coeffs[i],coeffs[j], 'o')
-                plt.savefig('c{0}-c{1}.png'.format(i, j))
-                plt.close()
-                j += 1
+        while i < len(coeffs):
+            if j < len(coeffs):
+                if i!=j:
+                    plt.plot(coeffs[i],coeffs[j], 'o')
+                    plt.savefig('c{0}-c{1}.png'.format(i, j))
+                    plt.close()
+                    j += 1
+                else:
+                    j += 1
+            else:
+                j = 0
+                i += 1
     return 'Figures saved!'
+
+def residuals(whitespecs, n):
+    """This function returns the residual percent error of an
+    n-dimensional basis approximation of our original specs data."""
 
 
 # def pcs_specs(filename):

@@ -142,7 +142,7 @@ which may or may not be the most useful way of doing so.
 \label{sec:sigma}
 The second output matrix of the numpy SVD function, $\Sigma$ is a
 pseudo-diagonal matrix that contains the singular values of the data
-matrix A
+matrix A, or the square roots of the eigenvalues of $A^{T}A$.
 
 \section{What to do next?}
 \label{sec:instructions}
@@ -188,8 +188,15 @@ In short, each coefficient row of $U$ contains the weights of all the
 vectors $\vec{v_{1}}, \vec{v_{2}},\ldots,\vec{v_{k}}$ found in the
 first $k$ rows of $V^{T}$.
 
+\section{Play-by-Play}
+\label{sec:procedure}
+
 The process of plotting all of these rows is very time consuming,
 however, so we're writing a function that will plot and save these
 figures for us to look at one at a time.
+
+\ldots and making a robust function was too time-consuming.  We're
+splitting up so that Anjali takes the residuals and I plow ahead, make
+plots, and look at stuff.
 
 \end{document}
