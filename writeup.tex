@@ -199,4 +199,46 @@ figures for us to look at one at a time.
 splitting up so that Anjali takes the residuals and I plow ahead, make
 plots, and look at stuff.
 
+We wrote a function to calculate the tolerance of an approximation!
+It's not yet good enough to cycle through all the n ways of cutting $U$,
+$\Sigma$, and $V^{T}$ yet, but maybe we'll get there.  Maybe.  Now
+we're going to interpret us some plots.  Yeeeaaahhhhhhhh!!!!
+
+We also created a function, \verb|reconstruct(specs, n)| that basically cuts our original, whitened
+data matrix appropriately in order to reconstruct an n-dimensional
+approximation of it.  Combined with \verb|residuals(whitespecs, recon_specs)| we can now take a look at our error margins relatively
+quickly.
+
+\subsection{Results?}
+\label{sec:results}
+
+So far we've made both risky and safe approximations.  For the n = 35
+attempt, we saw a whopping maximum error of 147.56674.  And, no, that's not
+even a percentage.  So then we tried something a bit more tame: n =
+104, without cutting off the first two ``bad'' days.  Reassuringly, we
+got a pretty low value.  Just so that we have a log of these number's,
+here's a handy dandy chart.
+\begin{table}[r]
+  \centering
+  \begin{tabular}[c]{c||cc}
+    \hline\hline
+    N & Average residual & Largest residual value \\
+    \hline \\
+    106 & 1.4022588e-13 & 2.2195765e-09 \\
+    105 & 1.4383019e-13 & 2.0904165e-09 \\
+    104 & 2.0376491e-09 & 5.0975949e-06 \\
+    103 & 3.2434754e-09 & 4.3732108e-06 \\
+    102 & 8.0214531e-09 & 1.8203477e-05 \\
+    101 & 3.3478537e-08 & 1.8572094e-04 \\
+    100 & 4.7932189e-08 & 1.8930889e-04 \\
+    99 & 7.1374826e-08 & 6.0613507e-04 \\
+    98 & 1.3442393e-07 & 1.0923505e-03 \\
+    35 & 9.2522540e-03 & 1.4756674e+02 \\
+    \hline\hline
+  \end{tabular}
+  \caption{The average and maximum residuals of our n-dimensional
+    approximation of the spectrum data.}
+\label{tab:residuals}
+\end{table}
+
 \end{document}

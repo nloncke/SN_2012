@@ -116,7 +116,7 @@ def ratio(arr):
         ratios[i-1] = (arr[i-1]/arr[i])
     return ratios[:-1]
 
-def plotcoeffs(coeffs, x_axis=None, y_axis=None):
+def plotcoeffs(coeffs, x_axis=None, y_axis=None, ext='pdf'):
     """Generates plots for all of the coordinates against each other
     and saves them in the format 'c{a}-c{b}.png'."""
 # FYI: This function doesn't really work yet...  We need more
@@ -126,14 +126,14 @@ def plotcoeffs(coeffs, x_axis=None, y_axis=None):
     if x_axis is not None and y_axis is None:
         while i < len(coeffs) and i!=x_axis:
             plt.plot(coeffs[x_axis],coeffs[i], 'o')
-            plt.savefig('c{0}-c{1}.png'.format(x_axis, i))
+            plt.savefig('c{0}-c{1}.{2}'.format(x_axis, i, ext))
             plt.close()
             i += 1
     j = 0
     if y_axis is not None and x_axis is None:
         while j < len(coeffs) and j!=y_axis:
             plt.plot(coeffs[j],coeffs[y_axis], 'o')
-            plt.savefig('c{0}-c{1}.png'.format(j, y_axis))
+            plt.savefig('c{0}-c{1}.{2}'.format(j, y_axis))
             plt.close()
             j += 1
     (i,j) = (0,0)
@@ -152,9 +152,57 @@ def plotcoeffs(coeffs, x_axis=None, y_axis=None):
                 i += 1
     return 'Figures saved!'
 
-def residuals(whitespecs, n):
+def residuals(whitespecs, reconspecs):
     """This function returns the residual percent error of an
     n-dimensional basis approximation of our original specs data."""
+
+    percent_error = np.abs(np.abs(whitespecs - reconspecs)/whitespecs)
+    tol = percent_error[np.unravel_index(np.argmax(percent_error), percent_error.shape)]
+    avg_err = np.average(percent_error)
+
+    return percent_error, avg_err, tol
+
+def reconstruct(specs, n):
+    """Because I'm sooo sloow on the interpreter, I'm writing us a
+    funtion that will cut and reconstruct an our data from an
+    n-dimensional basis.  Here goes!"""
+
+    U, singvals, Vt = np.linalg.svd(whiten(specs)[1])
+    Ucut = U.T[:n].T
+    S = np.zeros((n, n))
+    S[:] = np.diag(singvals[:n])
+    Vtcut = Vt[:n]
+    new_data = np.dot(np.dot(Ucut,S), Vtcut)
+    
+    return new_data
+
+def everything(specs):
+    """Produces a three-dimensional matrix.
+    axis0=n, where n is the number of basis vectors used in the
+    reconstruction
+    axis1=day, the day # of the flux data over all wavelengths
+    (i.e., corresponding to a row of specs)
+    axis2=flux data"""
+    
+    everything = np.zeros((len(specs), len(specs), specs.shape[1]))
+    everything[0,:,:] = whiten(specs)[0]
+    for n in range(1, len(specs)):
+        X = reconstruct(specs, n)
+        everything[n,:,:] = X
+
+
+
+def resid_by_n(specs, day):
+    """Returns a plot of the residuals for a given day over all n's, where n is the
+    number of principal components used to recreate the data."""
+    
+    recons = np.zeros(len(specs), specs.shape)
+    
+    for n in range(len(specs)):
+        X = reconstruct(specs, n+1)
+        residuals[] = residuals(whiten(specs)[1], X)[2]
+
+
 
 
 # def pcs_specs(filename):
