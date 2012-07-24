@@ -162,19 +162,24 @@ def residuals(whitespecs, reconspecs):
 
     return percent_error, avg_err, tol
 
-def reconstruct(specs, n):
+def tribute(specs, n):
     """Because I'm sooo sloow on the interpreter, I'm writing us a
-    funtion that will cut and reconstruct an our data from an
-    n-dimensional basis.  Here goes!"""
+    funtion that will return the constribution of the nth vector of
+    our PCA'd basis.  Not all of the vectors from one through n, only
+    the nth.  **Note that the 0th vector is now the mean, and is
+    weighted by ones in the coefficient matrix (coeffs).**"""
 
     U, singvals, Vt = np.linalg.svd(whiten(specs)[1])
-    Ucut = U.T[:n].T
-    S = np.zeros((n, n))
-    S[:] = np.diag(singvals[:n])
-    Vtcut = Vt[:n]
-    new_data = np.dot(np.dot(Ucut,S), Vtcut)
+    S = np.zeros((len(singvals), len(Vt)))
+    Vt = np.vstack((np.mean(specs, axis=0), Vt))
+    # Ucut = U.T[n].T
+    S[:len(singvals), :len(singvals)] = np.diag(singvals)
+    Vtcut = Vt[n]
+
+    coeffs = np.hstack((np.ones((len(U), 1)), np.dot(U,S)))
+    tribute = coeffs[:,n].reshape((len(coeffs),1)) * Vtcut
     
-    return new_data
+    return tribute 
 
 def everything(specs):
     """Produces a three-dimensional matrix.
@@ -187,9 +192,9 @@ def everything(specs):
     everything = np.zeros((len(specs), len(specs), specs.shape[1]))
     everything[0,:,:] = whiten(specs)[0]
     for n in range(1, len(specs)):
-        X = reconstruct(specs, n)
-        everything[n,:,:] = X
+        everything[n,:,:] = tribute(specs, n) + everything[n-1,:,:]
 
+    return everything
 
 
 def resid_by_n(specs, day):
@@ -200,7 +205,7 @@ def resid_by_n(specs, day):
     
     for n in range(len(specs)):
         X = reconstruct(specs, n+1)
-        residuals[] = residuals(whiten(specs)[1], X)[2]
+        residuals[:] = residuals(whiten(specs)[1], X)[2]
 
 
 
