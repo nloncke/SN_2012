@@ -216,7 +216,7 @@ So far we've made both risky and safe approximations.  For the n = 35
 attempt, we saw a whopping maximum error of 147.56674.  And, no, that's not
 even a percentage.  So then we tried something a bit more tame: n =
 104, without cutting off the first two ``bad'' days.  Reassuringly, we
-got a pretty low value.  Just so that we have a log of these number's,
+got a pretty low value.  Just so that we have a log of these numbers,
 here's a handy dandy chart.
 \begin{table}[r]
   \centering
@@ -240,5 +240,16 @@ here's a handy dandy chart.
     approximation of the spectrum data.}
 \label{tab:residuals}
 \end{table}
+
+\subsection{Results Pt. II}
+\label{sec:results2}
+So, after talking to Gabe we found out that the functions we created
+were correct, but either weren't conducive to efficiency, or they
+simply weren't what he was looking for.  Whatever.  So we're writing
+some functions that treat the process as calculating the
+\emph{elements} of the n-term sum instead of just calculating the nth
+order approximation.  And then we're recursively computing the partial
+sums by recursively adding on the contribution of each basis vector
+because we do actually want all of the sums.
 
 \end{document}
