@@ -46,7 +46,7 @@ def pca_partial_sums(coeffs, basisvecs):
     to a row of specs) axis2=flux data.
     """
     
-    result_shape = (basisvecs[1:,:].shape[0],) + coeffs[:,1:].shape
+    result_shape = (coeffs.shape[0],) + coeffs[:,1:].shape
     result = np.zeros(result_shape)
     result[0,:,:] = nth_pca_term(0, coeffs, basisvecs)
     for n in range(1, len(result)):
@@ -69,4 +69,3 @@ def pca_partial_sums(coeffs, basisvecs):
 #     new_data = np.dot(np.dot(Ucut,S), Vtcut)
 
 #     return new_data
-
