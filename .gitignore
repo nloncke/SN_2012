@@ -1,0 +1,11 @@
+% This is my .gitignore file where I can store the extensions I want
+% git not to track and not even to register as being untracked.
+
+*.py~
+*.pyc
+*.pdf
+*.png
+
+*.tex~
+*.aux
+*.log
