@@ -12,7 +12,9 @@ def whiten(arr):
 
 def pca(arr):
     """Enter the array of the data you want to PCA and return singvals
-    (an array of the singular values from SVD), coeffs, and bigVt.
+    (an array of the singular values from SVD), coeffs (each row
+    has the coefficients for a day), and V (with
+    eigenvectors in rows, and the mean stacked on the top).
     """
 
     arrmean, whitened_arr = whiten(arr)
@@ -28,32 +30,45 @@ def pca(arr):
     return singvals, coeffs, basisvecs
 
 def nth_pca_term(n, coeffs, basisvecs):
-    """Because I'm sooo sloow on the interpreter, I'm writing us a
-    funtion that will return the constribution of the nth vector of
+    """Returns the contribution of the nth vector of
     our PCA'd basis.  Not all of the vectors from one through n, only
     the nth.  **Note that the 0th vector is now the mean, and is
     weighted by ones in the coefficient matrix (coeffs).**
     """
 
+    is_coeffs_1D = (len(coeffs.shape) == 1)
+    if is_coeffs_1D:
+        coeffs = coeffs.reshape((1, len(coeffs)))
+        # len(coeffs) will be 1 if "if"-body executed
     coeffs_n = coeffs[:,n].reshape((len(coeffs),1))
-    return coeffs_n * basisvecs[n]
+    # Previous line makes broadcast rules work for next line
+    result = coeffs_n * basisvecs[n]
+    if is_coeffs_1D:
+        result.resize((result.shape[1],))
+    return result
     
 
-def pca_partial_sums(coeffs, basisvecs):
+def partial_sums(coeffs, basisvecs):
     """Produces a three-dimensional matrix.  axis0=n, where n is the
     number of basis vectors used in the reconstruction axis1=day, the
     day # of the flux data over all wavelengths (i.e., corresponding
-    to a row of specs) axis2=flux data.
+    to a row of specs) axis2=flux data.  If coeffs is J x M, basisvecs
+    is M x N, then the result ought to be M x J x N
     """
-    
-    result_shape = (coeffs.shape[0],) + coeffs[:,1:].shape
+
+    result_shape = (len(basisvecs), len(coeffs), len(basisvecs.T))
     result = np.zeros(result_shape)
     result[0,:,:] = nth_pca_term(0, coeffs, basisvecs)
     for n in range(1, len(result)):
         result[n,:,:] = (result[n-1,:,:] +
                          nth_pca_term(n, coeffs, basisvecs))
-
+    
     return result
+
+    # To be honest, I don't understand why we slice the first column
+    # of coeffs to give us the shape, but it works on the
+    # interpreter, so
+
 
 # def reconmat(specs, n):
 #     """Kind of superfluous function that we're keeping so that we can

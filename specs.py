@@ -1,29 +1,29 @@
-import matplotlib.pyplot as plt
+"""This module holds our most fundamental functions for extracting
+spectral data from a file and plotting relevant information without
+really modifying the data."""
+
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 def process_data(filename):
-    """Converts raw data from a file into three arrays...
+    """Converts raw column data from a file into arrays.  For our
+    purposes, we want to extract an array for day numbers,
+    wavelengths, and flux values, so we've sliced the arrays and given them
+    suggestive names.  
     """
 
     file_arr = np.genfromtxt(filename)
 
-## Note to self: these are not separate arrays yet!!!  They are only
-## pointers and have the same base as file_arr.  Potential source of
-## confusion...
-    dayarr = np.unique(file_arr[:, 0]) ## This array holds all the day
-                                ## numbers in increasing order
-                                ## (starting negative through zero, to
-                                ## the positive
-    lams = np.unique(file_arr[:, 1]) ## All the wavelengths
-                                ## values, non-repeating
-    specs = file_arr[:, 2].reshape((len(dayarr),len(lams))) ## All the
-                                ## spectra values per day in order of
-                                ## increasing wavelength
+    dayarr = np.unique(file_arr[:, 0])
+    lams = np.unique(file_arr[:, 1]) 
+    specs = file_arr[:, 2].reshape((len(dayarr),len(lams)))
+
     return dayarr, lams, specs
 
+
 def day_idx(day,dayarr):
-    """Prints the index number of the input day in dayarr.  E.g. '-15'
-    yields '5' or something like that.
+    """Returns the index number of the input day relative to dayarr.
     """
 
     idx = np.where(dayarr==day)[0][0]
@@ -43,12 +43,9 @@ def day_idx(day,dayarr):
 
 
 def plotspec(day, dayarr, lams, specs, display=True, save=False, ext='pdf'):
-    """Plots flux values vs. wavelength for a specified day
+    """Plots flux values vs. wavelength for a specified day value (not
+    an index number.
     """
-
-    # day_idx(dayarr,day)
-    # idx = np.where(dayarr==day)[0][0]
-    # title = 'Day ' + str(day)
 
     xvals = lams
     yvals = specs[day_idx(day, dayarr),:]
@@ -73,14 +70,15 @@ def plotspec(day, dayarr, lams, specs, display=True, save=False, ext='pdf'):
 
 def specplotter(dayarr, lams, specs, ext='pdf'):
     """Function factory that produces plotter_func, a function that
-    takes in just the day and plots everything
+    takes in a day and plots the spectrum for that day.
     """
     def plotter_func(day):
         return plotspec(day, dayarr, lams, specs, ext)
     return plotter_func
 
+
 def filespecplotter(filename, ext='pdf'):
-    """Plotting function for spectra in {0}.""".format(filename)
+    """'Plotting function for spectra in {0}'.format(filename)"""
 
     dayarr, lams, specs = process_data(filename)
     return specplotter(dayarr, lams, specs, ext)
