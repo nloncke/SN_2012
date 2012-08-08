@@ -1,86 +1,61 @@
 import numpy as np
 
-def whiten(arr):
+def whiten(data):
     """Given an array, calculate the mean by columns.  Return the mean
     vector (row) and then the zero-meaned matrix.
     """
     
-    meandata = np.mean(arr, axis=0)
-    whitened_arr = arr[:,] - meandata
+    meandata = np.mean(data, axis=0)
+    whiteneddata = data[:,] - meandata
 
-    return meandata, whitened_arr
+    return meandata, whiteneddata
 
-def pca(arr):
-    """Enter the array of the data you want to PCA and return singvals
-    (an array of the singular values from SVD), coeffs (each row
-    has the coefficients for a day), and V (with
-    eigenvectors in rows, and the mean stacked on the top).
+def pca(data):
+    """PCA from SVD, returns the singular values, the coefficients (in
+    rows, with a column of ones at the beginning), and the basis
+    vectors (also in rows, with the mean stacked on top).
     """
 
-    arrmean, whitened_arr = whiten(arr)
-    U, singvals, Vt = np.linalg.svd(whitened_arr)
+    meandata, whitedata = whiten(data)
+    U, singvals, Vt = np.linalg.svd(whitedata)
     
-    S = np.zeros(arr.shape)
+    S = np.zeros(data.shape)
     numsings = len(singvals)
     S[:numsings, :numsings] = np.diag(singvals)
 
     coeffs = np.hstack((np.ones((len(U),1)), np.dot(U,S)))
-    basisvecs = np.vstack((arrmean, Vt))
+    basisvectors = np.vstack((meandata, Vt))
 
     return singvals, coeffs, basisvecs
 
-def nth_pca_term(n, coeffs, basisvecs):
-    """Returns the contribution of the nth vector of
-    our PCA'd basis.  Not all of the vectors from one through n, only
-    the nth.  **Note that the 0th vector is now the mean, and is
-    weighted by ones in the coefficient matrix (coeffs).**
+def nthpcaterm(N, coeffs, basisvectors):
+    """Returns the Nth term of the partial sum from our PCA'd basis.
     """
 
     is_coeffs_1D = (len(coeffs.shape) == 1)
     if is_coeffs_1D:
         coeffs = coeffs.reshape((1, len(coeffs)))
         # len(coeffs) will be 1 if "if"-body executed
-    coeffs_n = coeffs[:,n].reshape((len(coeffs),1))
+    coeffs_n = coeffs[:,N].reshape((len(coeffs),1))
     # Previous line makes broadcast rules work for next line
-    result = coeffs_n * basisvecs[n]
+    result = coeffs_n * basisvectors[N]
     if is_coeffs_1D:
         result.resize((result.shape[1],))
     return result
     
 
-def partial_sums(coeffs, basisvecs):
-    """Produces a three-dimensional matrix.  axis0=n, where n is the
-    number of basis vectors used in the reconstruction axis1=day, the
-    day # of the flux data over all wavelengths (i.e., corresponding
-    to a row of specs) axis2=flux data.  If coeffs is J x M, basisvecs
-    is M x N, then the result ought to be M x J x N
+def partial_sums(coeffs, basisvectors):
+    """Input: Coeffs (in rows), Basisvectors (in rows). Output:
+    three-dimensional matrix of partial sums. If coeffs is J x M, and
+    basisvectors is M x N, then the result will be M x J x N
     """
 
-    result_shape = (len(basisvecs), len(coeffs), len(basisvecs.T))
+    result_shape = (len(basisvectors), len(coeffs), len(basisvectors.T))
     result = np.zeros(result_shape)
-    result[0,:,:] = nth_pca_term(0, coeffs, basisvecs)
+    result[0,:,:] = nthpcaterm(0, coeffs, basisvectors)
     for n in range(1, len(result)):
         result[n,:,:] = (result[n-1,:,:] +
-                         nth_pca_term(n, coeffs, basisvecs))
+                         nthpcaterm(n, coeffs, basisvectors))
     
     return result
 
-    # To be honest, I don't understand why we slice the first column
-    # of coeffs to give us the shape, but it works on the
-    # interpreter, so
-
-
-# def reconmat(specs, n):
-#     """Kind of superfluous function that we're keeping so that we can
-#     check stuff on the interpreter.  Basically, it returns the
-#     re-creation of the data using up to n vectors.  Our replacement
-#     function mk.tribute(specs, n) just gives us the contribution of the nth vector."""
-
-#     U, singvals, Vt = np.linalg.svd(whiten(specs)[1])
-#     Ucut = U.T[:n].T
-#     S = np.zeros((n, n))
-#     S[:] = np.diag(singvals[:n])
-#     Vtcut = Vt[:n]
-#     new_data = np.dot(np.dot(Ucut,S), Vtcut)
-
-#     return new_data
