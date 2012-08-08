@@ -7,10 +7,9 @@ import matplotlib.pyplot as plt
 
 
 def process_data(filename):
-    """Converts raw column data from a file into arrays.  For our
-    purposes, we want to extract an array for day numbers,
-    wavelengths, and flux values, so we've sliced the arrays and given them
-    suggestive names.  
+    """Converts file with astronomical data into three arrays: an
+    array of the epochs, the wavelengths, and the fluxes.  This only
+    works with the Hsiao file.
     """
 
     file_arr = np.genfromtxt(filename)
@@ -23,28 +22,17 @@ def process_data(filename):
 
 
 def day_idx(day,dayarr):
-    """Returns the index number of the input day relative to dayarr.
+    """Returns the index number of the input day relative to the array
+    of days.
     """
 
     idx = np.where(dayarr==day)[0][0]
     return idx
 
 
-# Also, two other ways to do it:
-
-## (y==day).tolist().index(True)
-
-## minday = dayarr[0]
-## idx_list= []
-    ## for entry in dayarr:
-    ## index = entry - minday
-    ## index = np.array()
-# return index
-
-
 def plotspec(day, dayarr, lams, specs, display=True, save=False, ext='pdf'):
-    """Plots flux values vs. wavelength for a specified day value (not
-    an index number.
+    """Plots flux values (or flams :D) vs. wavelength for a specified day (not
+    an index number).
     """
 
     xvals = lams
@@ -78,8 +66,7 @@ def specplotter(dayarr, lams, specs, ext='pdf'):
 
 
 def filespecplotter(filename, ext='pdf'):
-    """'Plotting function for spectra in {0}'.format(filename)"""
+    """'Plotting function for spectra in input file."""
 
     dayarr, lams, specs = process_data(filename)
     return specplotter(dayarr, lams, specs, ext)
-
