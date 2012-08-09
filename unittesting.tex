@@ -1,0 +1,387 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+\textsc{Here} are our unit tests for our pca.py module.
+\section{\texttt{pca.partial\_sums()}}
+\label{sec:partialsums}
+
+We used the matrices
+\[coeffs = \left[ \begin{array}{ccc}
+4 & 1 & 3 \\
+-1 & 2 & 5 \\
+10 & -1 & 4 \\
+2 & 7 & -9 \\
+3 & -3 & 8 \\
+6 & 6 & -1
+\end{array} \right] \]
+and
+\[bvecs = \left[ \begin{array}{ccccc}
+1 & -2 & 3 & 4 & -5 \\
+-6 & 7 & 0 & 9 & 10 \\
+8 & -1 & 2 & -2 & 3
+\end{array} \right] \]
+
+for our coefficients and basis vectors, respectively.
+
+\subsection{Expected output}
+\label{sec:manual}
+
+We manually calculated that our \verb|pca.partial_sums()| function
+ought to output a three-dimensional array as follows when passed
+coeffs and basisvecs.
+
+\[n=0 \left[ \begin{array}{ccccc}
+4 & -8 & 12 & 16 & -20 \\
+-1 & 2 & -3 & -4 & 5 \\
+0 & 0 & 0 & 0 & 0 \\
+2 & -4 & 6 & 8 & -10 \\
+3 & -6 & 9 & 12 & -15 \\
+6 & -12 & 18 & 24 & -30
+\end{array} \right] \]
+
+\[n=1 \left[ \begin{array}{ccccc}
+-2 & -1 & 12 & 25 & -10 \\
+-13 & 16 & -3 & 14 & 25 \\
+6 & -7 & 0 & -9 & -10 \\
+-40 & 45 & 6 & 71 & 60 \\
+21 & -27 & 9 & -15 & -45 \\
+-30 & 30 & 18 & 78 & 30
+\end{array} \right] \]
+
+\[n=2 \left[ \begin{array}{ccccc}
+22 & -4 & 18 & 19 & -1 \\
+27 & 11 & 7 & 4 & 40 \\
+38 & -4 & 8 & -17 & 2 \\
+-112 & 54 & -12 & 89 & 33 \\
+85 & -35 & 25 & -31 & -21 \\
+-38 & 31 & 20 & 76 & 33
+\end{array} \right] \]
+
+\subsection{Code Issues}
+\label{sec:coding}
+
+On both of our machines we found that the function was barfing a
+ValueError due to the shape that we set for the result in our script.
+
+\begin{verbatim}
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call
+last)
+/home/nicole/Documents/summerprog/hsiao_spectra/<ipython-input-263-41a4b465b960>
+in <module>()
+----> 1 pca.partial_sums(c1, bvecs)
+
+/home/nicole/Documents/summerprog/hsiao_spectra/pca.py in
+partial_sums(coeffs, basisvecs)
+     59     result_shape = (basisvecs.shape[0],) + coeffs.shape
+     60     result = np.zeros(result_shape)
+---> 61     result[0,:,:] = nth_pca_term(0, coeffs, basisvecs)
+     62     for n in range(1, len(result)):
+     63         result[n,:,:] = (result[n-1,:,:] +
+
+ValueError: operands could not be broadcast together with shapes (6,3)
+(6,5) 
+\end{verbatim}
+
+So, all three of us agreed Thursday night on the shape of the result matrix.  We
+figured if we had J x M coeffs and M x N basisvecs, then our
+three-dimensional partial sums matrix ought to be J x M x
+N.\footnote{Given J ``objects'' in the coefficient matrix, we should
+  be able to reproduce J partial sums, right?  This is what we were
+  thinking at the time.}  However,
+we realized on Friday that this doesn't make any sense if we only have
+M basis vectors, though.  How can we have a partial sum with $>$M terms
+if the basis is M-dimensional?  We should only have as many partial
+sums as there are terms, no?
+
+In line with this line of reasoning, we changed the shape of our
+placeholder zero matrix (the one that would eventually hold all the
+partial sums) to be M x J x N.\footnote{Our code looks like this
+  now: \texttt{result\_shape=len(basisvecs), len(coeffs),
+    len(basisvecs.T)}} After reloading the module, we found that these
+dimensions no longer gave us an error and produced the matrix we had
+calculated previously.  Hooray!
+
+\subsection{Uh-oh}
+\label{sec:99problems}
+
+So, our function takes up a lot of memory apparently, and also freezes
+computers and hates Ninjali.  Even when she tries to be a reasonable
+person and save the output.
+
+To solve this, we cut the big ass partial sums matrix so that it only
+includes up to the 200th order partial sum.  That should be enough in
+order to recreate our spectra reasonably.  (Fingers crossed.)
+
+\section{\texttt{res.residuals()}}
+\label{sec:residuals}
+\textsc{Leaving} pca.py, we now turn to our troublesome resids.py
+module.  Many of these functions appear simple, yet they have been the
+source of lots of trouble.
+
+The first stumbling block is the foundation of the script in a way.
+Though it isn't frequently called by the other functions, it
+calculates the raw residual for us.
+
+We knew that this function worked the way we wanted it to with two
+exceptions.  Each subsection of this chapter describes the two
+different problems and our approaches to them.
+
+\subsection{ZeroDivisionError}
+\label{sec:zerodivision}
+We wrote our percent error function so that when passed two matrices,
+$act$ and $est$, it would return $(act - est)/act$.  This is all fine
+and good, unless any entry in the $act$ matrix is zero.
+
+The good thing is that Python specifically tells us that the problem
+is division by zero, rather than syntax or something like that.  The
+bad news is that we might still want the process to work and just not
+operate for that particular entry.
+
+Right now, I'm thinking that we could ask Python to print the index
+location of any and all problem entries so that we know where the
+zeros are in $act$.  Implementation to come\ldots
+
+\subsection{Floats vs. Ints}
+\label{sec:float}
+
+The other problem was that if our $act$ and $est$ matrices were
+composed entirely of integer entries, then the difference would result in
+an array of ints and thus the quotient would be computed in the
+strange way that Python computes integer quotients.  Namely, $2/3 = 0$,
+which is clearly not what we want\ldots
+
+We didn't run into this problem because we were primarily handling
+flux values and other things that have decimals, but just to be safe,
+we didn't want to run into this awkward error.
+
+First we assumed there was a function called \verb|np.float| that
+would convert all the entries in $act$ to floats, but while there was
+a function so named, it didn't do what we wanted it to.
+
+It turns out that you can pass \verb|np.array()| the kwarg dtype,
+though, and change the data type of all the entries that way.  Our
+code now has the line
+
+\begin{verbatim}
+    act = np.array(act, dtype=float)
+\end{verbatim}
+to fix the problem.  We tested this on our $basisvecs$ matrix and got
+the desired result.  The only problem is that our method creates a new
+array, which is okay for now, but we would ideally not do that for
+memory conservation. 
+
+
+\section{\texttt{res.maxresidual()}}
+\label{sec:maxresidual}
+\begin{verbatim}
+"""Finds the maximum (unsigned) percent error. By default, the array is
+flattened, but set axis=0 for maxing along columns and axis=1 for the
+rows."""
+\end{verbatim}
+
+I just wanted to test this function to make sure I understood the axes
+correctly, to be honest.  We used a carefully engineered test matrix,
+
+\[test= \left[ \begin{array}{ccc}
+1 & 2 & 15 \\
+-16 & 5 & 6 \\
+7 & 8 & 9 \\
+10 & 11 & -15
+\end{array} \right]. \]
+
+For the different kwarg axis values, I expected the outputs found in
+Table \ref{tab:axes}.
+
+\begin{table}
+  \centering
+  \begin{tabular}[c]{c|c}
+    \hline\hline
+    Axis & \verb|maxresidual(test, axis)| \\
+    \hline \\ [-1.5ex]
+    None & 15 \\ [1ex]
+    0 & array([10, 11, 15]) \\ [1ex]
+    1 & array([15, 6, 9, 11]) \\ [1ex]
+    \hline
+  \end{tabular}
+  \caption{The expected outputs of \texttt{res.maxresidual(test,
+      axis)}}
+\label{tab:axes}
+\end{table}
+% Figure out how to get column borders in TeX!!!
+
+So, these were not the outputs returned by the function!  But that's
+okay because I was just being dumb; even though it was right there in
+the docstring, I forgot that our maxresidual function took the
+absolute value of our matrix before plucking out the maximum values.
+
+With this in mind, the real outputs (found in Table \ref{tab:axes2}) make 100\% sense.  Our res.maxresidual()
+works just the way we want it to.
+
+\begin{table}
+  \centering
+  \begin{tabular}[c]{c|c}
+    \hline\hline
+    Axis & \verb|maxresidual(test, axis)| \\
+    \hline \\ [-1.5ex]
+    None & 16 \\ [1ex]
+    0 & array([16, 11, 15]) \\ [1ex]
+    1 & array([15, 16, 9, 15]) \\ [1ex]
+    \hline
+  \end{tabular}
+  \caption{The actual outputs of \texttt{res.maxresidual(test,
+      axis)}}
+\label{tab:axes2}
+\end{table}
+
+
+\section{\texttt{res.graphmaxresiduals()}}
+\label{sec:graphmaxresiduals}
+
+Even though we originally thought it unnecessary to unit test our
+graphing functions, we did find a small bug\footnote{Thanks log
+  scaling\ldots} in \verb|graphresiduals()| so it's not a bad idea to
+check everything.
+
+Here's a rundown of what the function does.  It takes in the
+three-dimensional matrix of residuals, \textit{resids}, which has the
+Nth order reconstruction of the spectral data along axis0, the list of
+flux values for a given day along axis1, and the flux values for a
+given wavelength along axis 3.  It also takes in the array of day
+numbers, \textit{dayarr}, and some kwargs but they're not the main
+focus here.
+
+First our function takes the maximum residuals along axis2, which
+means it pulls out a single maximum residual for each day, for each
+value of N. This creates a two-dimensional matrix where axis0
+represents N and axis1 represents the different days -- in our code,
+this is \textit{maxbyday}.
+
+Then our function does either of two things:
+\begin{enumerate}
+\item If it is passed a value for the day kwarg, it will slice
+  \textit{maxbyday} and plot the maximum residual values for that day
+  as a function of N.
+\item If day=None, our function will max along axis1 of \textit{maybyday}.
+  This action is equivalent to taking the maximum residual value
+  across all of the days at a given N.  These \"{u}ber maximum residuals
+  are plotted as a function of N.
+\end{enumerate}
+
+So to test this function, we created a three-dimensional matrix,
+
+\[test= \left[ \begin{array}[c]{c}
+    
+    \left( \begin{array}[c]{cccccc}
+        1 & -2 & 3 & 4 & -5 & 6 \\
+        -6 & 7 & 8 & 9 & 10 & -11 \\
+        1 & 2 & -3 & 4 & 5 & 6
+        \end{array} \right), \\
+
+      \\
+
+    \left( \begin{array}[c]{cccccc}
+        11 & 12 & 13 & 14 & -15 & 16 \\
+        7 & 8 & 9 & 10 & 11 & 12 \\
+        -16 & 12 & 9 & -2 & 5 & -8 \\
+        \end{array} \right), \\
+
+      \\
+
+    \left( \begin{array}[c]{cccccc}
+        4 & 2 & 7 & 9 & -12 & 0 \\
+        -3 & 27 & 9 & 21 & 14 & 7 \\
+        5 & 10 & 15 & -20 & 37 & 2 \\
+    \end{array} \right)
+
+\end{array} \right]. \]
+
+We also had to make another array that would substitute as our 'day
+array' for indexing purposes.  Because test.shape = (3,3,6),
+\textit{dayarr}, our array of 'days,' has the shape (3,).  Arbitrarily
+I chose \[dayarr=\left[\begin{array}{ccc} -1 & 0 & 1 \end{array}\right]. \]
+
+If we do res.graphmaxresiduals(test, dayarr, day=-1), we would expect
+a plot of the points (0, 6), (1, 16), and (2, 12).  Similarly, if we set
+day=0, we would get a plot of the points (0, 11), (1, 12), and (2, 27).
+Just for completeness' sake, day=1 would yield (0, 6), (1, 16), and
+(2, 37).\footnote{Note that because our function calls \texttt{day\_idx()} from our
+specs.py module, graphmaxresiduals(test, dayarr, day=2) would give us
+an IndexError.  You want to pass graphmaxresiduals() the values in \emph{dayarr}.}
+
+Now, we created the function for the purpose of examining our
+residuals, so by default it plots these points on a log scale, but I
+momentarily commented the scaling part out just to make sure the
+points look like the ones I expect.  Everything checks out.
+
+If we were to ignore the day kwarg and use the default day=None, then
+we would expect our function to plot (0, 11), (1, 16), and (2, 37).
+This was exactly what our function returned.\footnote{Also, note that
+  this function also returns the y-values that it plots as an array,
+  in case you would like to see the numbers and perhaps do something with them.}
+
+
+\section{\texttt{res.graphresiduals()}}
+\label{sec:graphmaxresiduals}
+
+This function plots the spectrum of residuals for a specified day from
+a specified Nth order reconstruction of the data.  Again, we used our
+three-dimensional \textit{test} matrix,
+
+\[ \left[ \begin{array}[c]{c}
+    
+    \left( \begin{array}[c]{cccccc}
+        1 & -2 & 3 & 4 & -5 & 6 \\
+        -6 & 7 & 8 & 9 & 10 & -11 \\
+        1 & 2 & -3 & 4 & 5 & 6
+        \end{array} \right), \\
+
+      \\
+
+    \left( \begin{array}[c]{cccccc}
+        11 & 12 & 13 & 14 & -15 & 16 \\
+        7 & 8 & 9 & 10 & 11 & 12 \\
+        -16 & 12 & 9 & -2 & 5 & -8 \\
+        \end{array} \right), \\
+
+      \\
+
+    \left( \begin{array}[c]{cccccc}
+        4 & 2 & 7 & 9 & -12 & 0 \\
+        -3 & 27 & 9 & 21 & 14 & 7 \\
+        5 & 10 & 15 & -20 & 37 & 2 \\
+    \end{array} \right)
+
+\end{array} \right], \]
+
+as our resids, and \[\left[\begin{array}{ccc} -1 & 0 &
+    1 \end{array}\right] \] for our \textit{dayarr}.  Because this
+function plots against an array of 'wavelengths' as x-values, we
+created another array, $lams$, with the shape (6,):
+
+\[ lams= \left[ \begin{array}{cccccc}
+    100 & 200 & 300 & 400 & 500 & 600 \\
+\end{array} \right]. \]
+
+We expect \verb|res.graphresiduals(day=-1, N=0, test, lams, dayarr)|
+to produce the array
+\[ \left[ \begin{array}{cccccc}
+1 & 2 & 3 & 4 & 5 & 6 \\
+\end{array} \right] \]
+
+and plot these as the y-values vs. the entries of $lams$ so that you
+get the points (100, 1), (200, 2),\ldots, (600, 6) on log-scaled axes.
+
+Were you instead to pass the arguments day=1 and N=2, you'd plot (100,
+5), (200, 10), (300, 15), (400, 20), (500, 37), and (600,
+2).\footnote{Again, remember that the day you enter in the argument
+  list is \emph{not} the index of anything in the array!  The day\_idx
+  function works behind the scenes so that you don't have to worry
+  about indexing.}  Essentially, our function slices the
+three-dimensional matrix of all the residuals to pick out the row of
+residual values that interests you and then plots the absolute value
+of that row.  This is exactly what we want it to do.
+
+
+\end{document}
