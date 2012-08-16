@@ -1,14 +1,31 @@
 import numpy as np
 
-def whiten(data):
-    """Given an array, calculate the mean by columns.  Return the mean
+def whiten(data, axis=0):
+    """Given a two-dimensional array, calculate the mean along the
+    specified axis (by default, along columns).  Return the mean
     vector (row) and then the zero-meaned matrix.
-    """
-    
-    meandata = np.mean(data, axis=0)
-    whiteneddata = data[:,] - meandata
+    """    
+
+    meandata = np.mean(data, axis)
+    if axis==0:
+        whiteneddata = data[:,] - meandata
+    else:
+        whiteneddata = (data.T[:,] - meandata).T
 
     return meandata, whiteneddata
+
+
+def scale(data, scalar):
+    """Scales spectra by the difference between their maximum and
+    minimum flux values.
+    """
+    amplitude = np.zeros((len(data), 1))
+    for i in np.arange(len(data)):
+        amplitude[i] = np.amax(data[i]) - np.amin(data[i])
+        factor = amplitude/scalar
+
+    return data/factor
+        
 
 def pca(data):
     """PCA from SVD, returns the singular values, the coefficients (in
@@ -26,7 +43,7 @@ def pca(data):
     coeffs = np.hstack((np.ones((len(U),1)), np.dot(U,S)))
     basisvectors = np.vstack((meandata, Vt))
 
-    return singvals, coeffs, basisvecs
+    return singvals, coeffs, basisvectors
 
 def nthpcaterm(N, coeffs, basisvectors):
     """Returns the Nth term of the partial sum from our PCA'd basis.
@@ -36,6 +53,7 @@ def nthpcaterm(N, coeffs, basisvectors):
     if is_coeffs_1D:
         coeffs = coeffs.reshape((1, len(coeffs)))
         # len(coeffs) will be 1 if "if"-body executed
+        # Is this the same as coeffs = coeffs[np.newaxis, :]?
     coeffs_n = coeffs[:,N].reshape((len(coeffs),1))
     # Previous line makes broadcast rules work for next line
     result = coeffs_n * basisvectors[N]

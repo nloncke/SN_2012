@@ -1,5 +1,5 @@
-"""Gives you coordinate information about an ellipse with user-specified
-axes."""
+"""Gives you coordinate information about an ellipse with
+user-specified axes."""
 
 import numpy as np
 # import matplotlib.pyplot as plt
@@ -68,7 +68,7 @@ def make_int(arr2D):
 def vlen(vector):
     """Calculates the Euclidean length of any n-Dimensional vector."""
     
-    v_sq = vector**2
+    v_sq = np.array(vector)**2
     v_sq_sum = v_sq.sum()
     vlen = np.sqrt(v_sq_sum)
     return vlen

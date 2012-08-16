@@ -6,12 +6,14 @@ import matplotlib.pyplot as plt
 import specs
 import pca
 
-def residuals(act, est):
+def residuals(act, est, scale=None):
     """Returns the residual matrix of the original data and
     reconstructed data.
     """
-    # act = np.array(act, dtype=float)
-    return (act - est)/act
+    act = np.array(act, dtype=float)
+    if scale is None:
+        scale = act
+    return (act - est)/scale
 
 
 def maxresidual(residuals, axis=None):
@@ -33,7 +35,7 @@ def graphresiduals(day, N, resids, lams, dayarr, style='o-',
 
     plt.xlabel(r'$\lambda$')
     plt.ylabel(r'$log(Residuals)$')
-    plt.title('{0}th order Residuals for Day{1}'.format(N, day))
+    plt.title('{0}th order Residuals for Day {1}'.format(N, day))
     plt.show()
 
     if save:

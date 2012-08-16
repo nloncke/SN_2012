@@ -28,7 +28,7 @@ def day_idx(day,dayarr):
 
     idx = np.where(dayarr==day)[0][0]
     return idx
-
+        
 
 def plotspec(day, dayarr, lams, specs, display=True, save=False, ext='pdf'):
     """Plots flux values (or flams :D) vs. wavelength for a specified day (not

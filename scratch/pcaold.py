@@ -1,9 +1,8 @@
 """Faciilitates the process of interpreting our PCA data that we get
 from np.linalg.svd"""
 
-import pylab as py
+import ~/Documents/summerprog/hsiao_spectra/pca.py as pca
 import numpy as np
-import multiply as mp
 
 def recover_basis(data):
     """This function takes in your data matrix and returns the
@@ -12,7 +11,7 @@ def recover_basis(data):
     include the relevant vectors according to the singular values."""
     
     cent_data = py.center_matrix(data)
-    xTx = mp.mult(cent_data.T,cent_data)
+    xTx = np.dot(cent_data.T, cent_data)
     new_basis = np.array(np.linalg.eig(xTx)[1])
 
     return new_basis
@@ -24,9 +23,9 @@ def encode_data(data):
     dimension-reduced basis and displays the projection of the
     original data on said basis in lower-dimensional space."""
 
-    cent_data = py.center_matrix(data)
+    cent_data = pca.whiten(data)[1]
     new_basis = recover_basis(data)
-    Y = mp.mult(cent_data, new_basis)
+    Y = np.dot(cent_data, new_basis)
 
     return np.array(Y)
 

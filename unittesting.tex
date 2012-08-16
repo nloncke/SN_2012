@@ -2,7 +2,8 @@
 \usepackage{amsmath}
 
 \begin{document}
-\textsc{Here} are our unit tests for our pca.py module.
+\textsc{Here} are our unit tests for our all the relevant modules,
+including pca.py and resids.py.
 \section{\texttt{pca.partial\_sums()}}
 \label{sec:partialsums}
 
@@ -29,34 +30,44 @@ for our coefficients and basis vectors, respectively.
 
 We manually calculated that our \verb|pca.partial_sums()| function
 ought to output a three-dimensional array as follows when passed
-coeffs and basisvecs.
+coeffs and basisvecs:
 
-\[n=0 \left[ \begin{array}{ccccc}
+\[
+\left[ \begin{array}[c]{c}
+
+\left[ \begin{array}{ccccc}
 4 & -8 & 12 & 16 & -20 \\
 -1 & 2 & -3 & -4 & 5 \\
 0 & 0 & 0 & 0 & 0 \\
 2 & -4 & 6 & 8 & -10 \\
 3 & -6 & 9 & 12 & -15 \\
 6 & -12 & 18 & 24 & -30
-\end{array} \right] \]
+\end{array} \right] \\
 
-\[n=1 \left[ \begin{array}{ccccc}
+\\
+
+\left[ \begin{array}{ccccc}
 -2 & -1 & 12 & 25 & -10 \\
 -13 & 16 & -3 & 14 & 25 \\
 6 & -7 & 0 & -9 & -10 \\
 -40 & 45 & 6 & 71 & 60 \\
 21 & -27 & 9 & -15 & -45 \\
 -30 & 30 & 18 & 78 & 30
-\end{array} \right] \]
+\end{array} \right] \\
 
-\[n=2 \left[ \begin{array}{ccccc}
+\\
+
+\left[ \begin{array}{ccccc}
 22 & -4 & 18 & 19 & -1 \\
 27 & 11 & 7 & 4 & 40 \\
 38 & -4 & 8 & -17 & 2 \\
 -112 & 54 & -12 & 89 & 33 \\
 85 & -35 & 25 & -31 & -21 \\
 -38 & 31 & 20 & 76 & 33
-\end{array} \right] \]
+\end{array} \right]
+
+\end{array}\right].
+\]
 
 \subsection{Code Issues}
 \label{sec:coding}
@@ -113,6 +124,8 @@ person and save the output.
 To solve this, we cut the big ass partial sums matrix so that it only
 includes up to the 200th order partial sum.  That should be enough in
 order to recreate our spectra reasonably.  (Fingers crossed.)
+
+
 
 \section{\texttt{res.residuals()}}
 \label{sec:residuals}
@@ -196,7 +209,7 @@ Table \ref{tab:axes}.
 
 \begin{table}
   \centering
-  \begin{tabular}[c]{c|c}
+  \begin{tabular}[c]{|c|c|}
     \hline\hline
     Axis & \verb|maxresidual(test, axis)| \\
     \hline \\ [-1.5ex]
@@ -221,7 +234,7 @@ works just the way we want it to.
 
 \begin{table}
   \centering
-  \begin{tabular}[c]{c|c}
+  \begin{tabular}[c]{|c|c|}
     \hline\hline
     Axis & \verb|maxresidual(test, axis)| \\
     \hline \\ [-1.5ex]
@@ -246,13 +259,13 @@ check everything.
 
 Here's a rundown of what the function does.  It takes in the
 three-dimensional matrix of residuals, \textit{resids}, which has the
-Nth order reconstruction of the spectral data along axis0, the list of
+$N^{th}$ order reconstruction of the spectral data along axis0, the list of
 flux values for a given day along axis1, and the flux values for a
 given wavelength along axis 3.  It also takes in the array of day
 numbers, \textit{dayarr}, and some kwargs but they're not the main
 focus here.
 
-First our function takes the maximum residuals along axis2, which
+First our function takes the maximum residuals along axis 2, which
 means it pulls out a single maximum residual for each day, for each
 value of N. This creates a two-dimensional matrix where axis0
 represents N and axis1 represents the different days -- in our code,
@@ -263,7 +276,7 @@ Then our function does either of two things:
 \item If it is passed a value for the day kwarg, it will slice
   \textit{maxbyday} and plot the maximum residual values for that day
   as a function of N.
-\item If day=None, our function will max along axis1 of \textit{maybyday}.
+\item If day=None, our function will max along axis 1 of \textit{maybyday}.
   This action is equivalent to taking the maximum residual value
   across all of the days at a given N.  These \"{u}ber maximum residuals
   are plotted as a function of N.
@@ -273,29 +286,30 @@ So to test this function, we created a three-dimensional matrix,
 
 \[test= \left[ \begin{array}[c]{c}
     
-    \left( \begin{array}[c]{cccccc}
+    \left[ \begin{array}[c]{cccccc}
         1 & -2 & 3 & 4 & -5 & 6 \\
         -6 & 7 & 8 & 9 & 10 & -11 \\
         1 & 2 & -3 & 4 & 5 & 6
-        \end{array} \right), \\
+        \end{array} \right] \\
 
       \\
 
-    \left( \begin{array}[c]{cccccc}
+    \left[ \begin{array}[c]{cccccc}
         11 & 12 & 13 & 14 & -15 & 16 \\
         7 & 8 & 9 & 10 & 11 & 12 \\
         -16 & 12 & 9 & -2 & 5 & -8 \\
-        \end{array} \right), \\
+        \end{array} \right] \\
 
       \\
 
-    \left( \begin{array}[c]{cccccc}
+    \left[ \begin{array}[c]{cccccc}
         4 & 2 & 7 & 9 & -12 & 0 \\
         -3 & 27 & 9 & 21 & 14 & 7 \\
         5 & 10 & 15 & -20 & 37 & 2 \\
-    \end{array} \right)
+    \end{array} \right]
 
 \end{array} \right]. \]
+
 
 We also had to make another array that would substitute as our 'day
 array' for indexing purposes.  Because test.shape = (3,3,6),
@@ -331,27 +345,27 @@ three-dimensional \textit{test} matrix,
 
 \[ \left[ \begin{array}[c]{c}
     
-    \left( \begin{array}[c]{cccccc}
+    \left[ \begin{array}[c]{cccccc}
         1 & -2 & 3 & 4 & -5 & 6 \\
         -6 & 7 & 8 & 9 & 10 & -11 \\
         1 & 2 & -3 & 4 & 5 & 6
-        \end{array} \right), \\
+        \end{array} \right] \\
 
       \\
 
-    \left( \begin{array}[c]{cccccc}
+    \left[ \begin{array}[c]{cccccc}
         11 & 12 & 13 & 14 & -15 & 16 \\
         7 & 8 & 9 & 10 & 11 & 12 \\
         -16 & 12 & 9 & -2 & 5 & -8 \\
-        \end{array} \right), \\
+        \end{array} \right] \\
 
       \\
 
-    \left( \begin{array}[c]{cccccc}
+    \left[ \begin{array}[c]{cccccc}
         4 & 2 & 7 & 9 & -12 & 0 \\
         -3 & 27 & 9 & 21 & 14 & 7 \\
         5 & 10 & 15 & -20 & 37 & 2 \\
-    \end{array} \right)
+    \end{array} \right]
 
 \end{array} \right], \]
 
@@ -383,5 +397,305 @@ three-dimensional matrix of all the residuals to pick out the row of
 residual values that interests you and then plots the absolute value
 of that row.  This is exactly what we want it to do.
 
+\section{\texttt{res.residuals()} II}
+\label{sec:residuals2}
+
+So, we tested our residuals function before and it was satisfactory.
+See Section \ref{sec:residuals} for a refresher of our resolution of
+any issues.  After attempting to analyze these residuals in plots,
+however, we realized that we were getting (what we thought to be) high
+residual values, particularly for the epochs way before peak
+brightness.  We don't know if this is due to the actual shape of the
+spectra for these epochs, or if this is due to the very small flux
+values.  For example, day -20 has fluxes on the order of $10^{-38}$.
+Dividing a very small number by this will give us a pretty large
+number, so we can't exactly take the outputs of \verb|res.residuals()|
+at face value.
+
+Instead we're going to introduce a scale kwarg that allows us to
+divide the difference $act-est$ by an input scale factor, which we
+intend to be the ``amplitude'' of the centered spectrum.\footnote{By
+  ``amplitude'' we mean the difference between the maximum flux value
+  and the minimum for that day.}
+
+Since we modified our code, we have to make sure it has retained its
+old functionality while being able to do new tricks.  Let's start by
+making sure the old tests (found above and in Anjali's
+testresids.tex) for this function still work.  We used her original
+$act$ and $est$ matrices,
+
+\[act=\left[\begin{array}{cccc}
+    1 & 4 & 7 & 9 \\
+    11 & 21 & 3 & 4 \\
+    6 & 8 & 1 & 42 \\
+    5 & 36 & 6 & 17
+\end{array} \right] \]
+
+and
+\[est=\left[\begin{array}{c}
+
+    \left[\begin{array}{cccc}
+      2 & 5 & 8 & 9 \\
+      13 & 20 & 3 & 3 \\
+      5 & 7 & 1 & 42 \\
+      4 & 35 & 6 & 16
+    \end{array} \right] \\
+
+  \\
+
+  \left[\begin{array}{cccc}
+      1 & 4 & 7 & 9 \\
+      11 & 20 & 3 & 4 \\
+      7 & 8 & 1 & 40 \\
+      5 & 36 & 6 & 17
+    \end{array} \right] \\
+
+  \\
+
+  \left[\begin{array}{cccc}
+      1 & 3 & 6 & 9 \\
+      11 & 21 & 3 & 4 \\
+      6 & 8 & 1 & 42 \\
+      5 & 36 & 6 & 17
+    \end{array} \right]
+
+\end{array}\right].\]
+
+
+We put in integer arrays and got the expected residual array in
+floats.  Now we have to check the bells and whistles.  If we try
+\verb|res.residuals(act, est, scale=2)|, we should get a result with
+the same shape as $est$, namely
+
+\[result= \left[ \begin{array}{c}
+
+    \left[\begin{array}{cccc}
+        -0.5 & -0.5 & -0.5 & 0 \\
+        -1 & 0.5 & 0 & 0.5 \\
+        0.5 & 0.5 & 0 & 0 \\
+        0.5 & 0.5 & 0 & 0.5
+      \end{array} \right] \\
+
+    \\
+
+    \left[\begin{array}{cccc}
+        0 & 0 & 0 & 0 \\
+        0 & 0.5 & 0 & 0 \\
+        -0.5 & 0 & 0 & 1 \\
+        0 & 0 & 0 & 0
+      \end{array} \right] \\
+
+    \\
+
+    \left[\begin{array}{cccc}
+        0 & 0.5 & 0.5 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0
+      \end{array} \right]
+
+\end{array} \right]. \]
+
+This was indeed the result that we obtained.  Interestingly enough,
+when we tried scale=0, Python doesn't return its usual DivideByZero
+error, but instead gives us a RuntimeWarning and returns a matrix of
+$\pm inf$s and $nan$s.  I'm not sure why, since we're just dividing by
+zero, but I thought it was cool\ldots 
+
+
+\section{\texttt{pca.whiten()}}
+\label{sec:whiten}
+
+In addition to the scaling of the spectra, we also wanted to try
+whitening the data matrix by columns \emph{and} rows in order to
+remove any vertical offset that may have been screwing up our
+approximations.  This means we needed to pass pca.whiten an $axis$
+kwarg so that it knows along which axis to calculate and subtract off
+the mean.
+
+\subsection{Rows \emph{and} Columns\ldots}
+\label{sec:rowsandcols}
+Averaging along a specific axis was no problem, but reworking the
+dimensions so that the subtraction works out was more difficult.  At
+first we tried the lines
+
+\begin{verbatim}
+if axis==0:
+    whiteneddata = data[:,] - meandata
+else:
+    whiteneddata = data[,:] - meandata
+\end{verbatim}
+
+in the hopes that the slicing from axis=0 would work for axis=1.
+However, this method returned a SyntaxError for the second
+if-statement.  We even tried \verb|data[ ,:]| (as opposed to
+\verb|data[,:]|) but that still failed.
+
+Instead, we decided to use the same notation, but operate on the
+transpose of the relevant matrices:
+
+\begin{verbatim}
+elif axis==1:
+    whiteneddata = (data.T[:,] - meandata).T
+else:
+    print 'Ruh roh, this function only works for two-dimensional matrices.'
+\end{verbatim}
+
+Now, we kind of wanted to figure out a way to make this function work
+for an N-dimensional data matrix, but for now this will do.  Using a
+modified version of our $act$ matrix,
+
+\[haha= \left[
+  \begin{array}{cccc}
+    1 & 4 & 7 & 9 \\
+    11 & 21 & 3 & 4 \\
+    6 & 8 & 1 & 42 \\
+    5 & 36 & 6 & 17 \\
+    -1 & 3 & 10 & -5
+  \end{array} \right] \]
+
+we predicted some outputs.  Along axis 0 the mean
+is
+\[\left[\begin{array}[c]{cccc}
+   4.4 & 14.4 & 5.4 & 13.4
+\end{array} \right] \]
+so we expect \verb|pca.whiten(haha, axis=0)| to return
+\[ \left[
+  \begin{array}{cccc}
+    -3.4 & -10.4 & 1.6 & -4.4 \\
+    6.6 & 6.6 & -2.4 & -9.4 \\
+    1.6 & -6.4 & -4.4 & 28.6 \\
+    0.6 & 21.6 & 0.6 & 3.6 \\
+    -5.4 & -11.4 & 4.6 & -18.4
+  \end{array} \right]. \]
+
+Yay!  Our function worked the way we wanted to for axis=0.  Now, we
+expect \verb|pca.whiten(haha, axis=1)| to return
+\[ \left[
+  \begin{array}{cccc}
+    -4.25 & -1.25 & 1.75 & 3.75 \\
+    1.25 & 11.25 & -6.75 & -5.75 \\
+    -8.25 & -6.25 & -13.25 & 27.75 \\
+    -11 & 20 & -10 & 1 \\
+    -2.75 & 1.25 & 8.25 & -6.75
+  \end{array} \right]. \]
+Double yay!  Still works.
+
+\subsection{Wait, \texttt{np.mean()}?}
+\label{sec:mean}
+
+\emph{NB: This function only works as intended on two-dimensional
+  matrices.}  It occured to me though, that as long as you passed our
+whitening function axis=0 or axis=1 as a kwarg it would still do
+\emph{something}, even to an ndarray of a bigillion dimensions. I was curious about how
+plain old \verb|np.mean()| would work on the outermost axis of an ndarray with
+$n\geq3$.
+
+Using a new matrix I created specifically for this portion of the test
+(ie, the means are easy to calculate by inspection), I began to explore
+averaging over ndarrays.  Here's the new matrix:
+
+\[a=\left[
+  \begin{array}{c}
+    \left[\begin{array}[c]{ccc}
+      0.1 & 0.2 & 0.3 \\
+      0.2 & 0.3 & 0.4
+    \end{array} \right] \\
+
+  \\
+
+  \left[\begin{array}[c]{ccc}
+      0.4 & 0.4 & 0.4 \\
+      0.7 & 0.6 & 0.8
+  \end{array} \right]
+  \end{array} \right].
+\]
+
+Before I tried to average along axis=0, I expected
+\verb|np.mean(a, axis=0)| to flatten each two-dimensional slice along
+the $0^{th}$ axis, and so return
+\[array(\left[
+\begin{array}{cc}
+  0.25, & 0.55
+\end{array} \right]),
+\]
+which is just the mean of all the elements of $a[0]$ and $a[1]$.
+
+Instead, what the function actually returned was
+\[\left[
+  \begin{array}[c]{ccc}
+    0.25 & 0.3 & 0.35 \\
+    0.45 & 0.45 & 0.6
+  \end{array}
+  \label{arr:axis0}
+\right].\]
+
+I stared at the output for a while and couldn't figure out what it
+meant, so I started fiddling with the other axes to see if they lent
+me any insight into the workings of NumPy's mean function.
+
+First, I moved onto axis=1.  I expected that this would average
+``along the columns'' of each matrix, which, I later realized, would
+be equivalent to doing \verb|np.mean(a[i,:,j])| for $i=[0, 1]$ and
+$j=[0, 1, 2]$. My expectation was to receive the output
+
+\[\left[
+  \begin{array}[c]{ccc}
+    0.15 & 0.25 & 0.35 \\
+    0.55 & 0.5 & 0.6
+  \end{array}
+\right].\]
+
+Luckily, this was actually what \verb|np.mean(a, axis=1)| returned.
+Similarly, I expected axis=2 to average ``along the rows'' of $a$ and
+return
+\[\left[
+  \begin{array}[c]{cc}
+    0.2 & 0.3 \\
+    0.4 & 0.7
+  \end{array}
+\right],\]
+which it did.
+
+Investigating the more familiar axes revealed to me how
+\verb|np.mean()| uses the axis kwarg.  The function slices along all
+the other axes \emph{except} the one specified, instead using a colon
+as a sort of placeholder index.  If my conclusion is right, then I
+should be able to obtain the entries of \verb|np.mean(a, axis=0)| by
+computing \verb|np.mean(a[:,i,j])| for $i=[0, 1]$ and $j=[0, 1, 2]$.
+I've included all of my predictions in Table
+\ref{tab:axis0predictions}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|c|l|}
+    \hline\hline
+    $(i,j)$ & \verb|mean(a[:,i,j])| \\
+    \hline \\ [-1.5ex]
+    (0, 0) & 0.25 \\
+    (0, 1) & 0.3 \\
+    (0, 2) & 0.35\\ [0.5ex] \hline
+    \\ [-1.75ex]
+    (1, 0) & 0.45 \\
+    (1, 1) & 0.45 \\
+    (1, 2) & 0.6 \\ [0.5ex]
+    \hline\hline
+  \end{tabular}
+  \caption{Expected entry computations for \texttt{np.mean(a,
+      axis=0)}.}
+\label{tab:axis0predictions}
+\end{table}
+
+Looking back at the actual output from axis=0, we see that these are
+indeed the same entries.  It took me way too long to figure this out,
+but I'm glad I did.
+
+\subsection{Rows and Columns, cont.}
+\label{sec:rowsandcols2}
+
+So, what does this mean in terms of our \verb|pca.whiten()| function,
+the only reason this section exists?  Coincidentally, the $a$
+matrix worked just because of the shape, I think, but when we try
+axis=1, the function barfs, so\ldots yeah.
 
 \end{document}
