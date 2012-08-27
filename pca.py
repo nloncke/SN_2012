@@ -19,13 +19,16 @@ def scale(data, scalar):
     """Scales spectra by the difference between their maximum and
     minimum flux values.
     """
+
+    if len(data.shape)==1:
+        data = data[np.newaxis, :]
     amplitude = np.zeros((len(data), 1))
     for i in np.arange(len(data)):
         amplitude[i] = np.amax(data[i]) - np.amin(data[i])
-        factor = amplitude/scalar
+        factor = scalar/amplitude
 
-    return data/factor
-        
+    return data*factor, factor
+
 
 def pca(data):
     """PCA from SVD, returns the singular values, the coefficients (in

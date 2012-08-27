@@ -1,9 +1,20 @@
 \documentclass{article}
 \usepackage{amsmath}
+\usepackage{graphicx}
 
 \begin{document}
-\textsc{Here} are our unit tests for our all the relevant modules,
-including pca.py and resids.py.
+
+\title{Unit Testing our Python Library}
+\date{\today}
+\maketitle
+
+\textsc{Here are} our unit tests for our research-related modules,
+pca.py and resids.py.
+
+\tableofcontents
+
+\newpage
+
 \section{\texttt{pca.partial\_sums()}}
 \label{sec:partialsums}
 
@@ -630,6 +641,8 @@ Instead, what the function actually returned was
   \label{arr:axis0}
 \right].\]
 
+
+
 I stared at the output for a while and couldn't figure out what it
 meant, so I started fiddling with the other axes to see if they lent
 me any insight into the workings of NumPy's mean function.
@@ -697,5 +710,65 @@ So, what does this mean in terms of our \verb|pca.whiten()| function,
 the only reason this section exists?  Coincidentally, the $a$
 matrix worked just because of the shape, I think, but when we try
 axis=1, the function barfs, so\ldots yeah.
+
+
+\section{\texttt{pca.scale()}}
+\label{sec:scale}
+
+Remember how we were talking about scaling each spectrum so that when
+we computed the residuals, we wouldn't have to divide by ridiculously
+small numbers on the order of $10^{-38}$?  Yeah, so we created a
+function for that and called it \verb|pca.scale|.  We designed it to
+operate on two-dimensional arrays in order to normalize all the
+spectra at once.
+
+\subsection{RuntimeWho?}
+\label{sec:scalewarning}
+So, we ran into unexpected issues with our straight-forward, five-line
+\verb|pca.scale| function.  Originally we had it doing division twice,
+but because the computer has to compute the reciprocals of the
+divisors and then do scalar multiplication, we modified the code so
+that division only appeared once, like so:
+
+\begin{verbatim}
+    amplitude = np.zeros((len(data), 1))
+    for i in np.arange(len(data)):
+        amplitude[i] = np.amax(data[i]) - np.amin(data[i])
+        factor = scalar/amplitude
+
+    return data*factor, factor.
+\end{verbatim}
+
+After reloading the pca.py module, we tried pca.scale(specs, 2.), where
+specs was our spectral data matrix and we received
+\begin{verbatim}
+RuntimeWarning: divide by zero encountered in divide
+    factor = scalar/amplitude
+\end{verbatim}
+instead of the two desired matrices.
+
+Now, we were confused by this, so we reloaded pca.py again and it
+worked fine\ldots.  This issue is still unresolved, but not a big
+problem, since things work.
+
+\subsection{A Toy Problem: using $\cos(\theta)$}
+\label{sec:cos}
+
+So, to make sure that \verb|pca.scale()| and \verb|pca.whiten()| work
+together, we made a plot of $4\cos(\theta) + 5$ for $0 \leq \theta <
+6\pi$, centered it, and then scaled it to a unit max-min difference of
+2, which is to say an amplitude of 1.  At each step we plotted our
+results.
+
+\begin{center}
+  \includegraphics[width=13cm]{costest.pdf}  
+\end{center}
+
+As we had hoped, we ended up with plots of $4\cos(\theta)$ after
+centering and $\cos(\theta)$ after rescaling.
+
+\begin{center}
+HOORAY.  
+\end{center}
 
 \end{document}

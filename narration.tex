@@ -1,4 +1,5 @@
-\documentclass{article} \usepackage{amsmath}
+\documentclass{article}
+\usepackage{amsmath}
 
 \begin{document}
 \section{Coding and things}
@@ -36,10 +37,12 @@ resulting matrix is still zero meaned, so it should be all good\ldots
 \label{sec:whydoestheuniversehateus}
 
 \subsection{Whitening}
-\label{whitening} After several (I mean \textsc{several}) attempts at
+\label{whitening}
+After several (I mean \textsc{several}) attempts at
 creating a whitening function that computed the means of the columns
 or rows of a matrix, we ran into an error that repeatedly said:
-\begin{verbatim} ERROR: Internal Python error in the inspect module.
+\begin{verbatim}
+ERROR: Internal Python error in the inspect module.
 Below is the traceback from this internal error.  Traceback (most
 recent call last): File
 "/usr/lib/python2.7/dist-packages/IPython/core/ultratb.py", line 756,
@@ -88,11 +91,11 @@ important for reasons that are still unclear.  Will SVD/PCA not
 recover a suitable basis if the data has been translated from some
 origin?  Does the process know of any origin, actually?  Huh\ldots
 
-\subsection{Choosing $\vec{u}$ and $\vec{v}$ for the ellipse} Another
-lingering question: our choice of $\vec{u}$ and $\vec{v}$ seem to be
-affecting our reduced dimension basis and therefore our projected
-ellipse.  We did the same exact pca process several times with a
-different 4-D plane each time and got wildly different results.
+\subsection{Choosing $\vec{u}$ and $\vec{v}$ for the ellipse}
+Another lingering question: our choice of $\vec{u}$ and $\vec{v}$ seem
+to be affecting our reduced dimension basis and therefore our
+projected ellipse.  We did the same exact pca process several times
+with a different 4-D plane each time and got wildly different results.
 
 For example, when we choose the orthonormal $\vec{u}$ and $\vec{v}$
 that you chose (with the original lengths of 13) everything worked
@@ -110,8 +113,11 @@ would explain this a little bit better now, but Gabe wrote some notes,
 plus Anjali will undoubtedly clear up any confusion in the morning.
 It's four minutes short of midnight.  Go to sleep.}
 
+
 \section{Using numpy.linalg.svd()}
-\label{sec:svd} So, we know that the process of singular value
+\label{sec:svd}
+
+So, we know that the process of singular value
 decomposition rewrites a matrix as the product of three matrices, each
 of which tells us something about the original matrix.  Typically, the
 decomposition is written as
@@ -122,7 +128,8 @@ decomposition is written as
 or alternatively,
 \begin{equation}
   \label{eq:svd2} AV = U \Sigma
-\end{equation} where A is the matrix you want to decompose.  For our
+\end{equation}
+where A is the matrix you want to decompose.  For our
 purposes, A is a data matrix, meaning
 
 This section explains how to interpret the output of the numpy SVD
@@ -130,10 +137,10 @@ function in terms of PCA, or at least how I've been interpreting it,
 which may or may not be the most useful way of doing so.
 
 \subsection{Interpreting $\Sigma$}
-\label{sec:sigma} The second output matrix of the numpy SVD function,
-$\Sigma$ is a pseudo-diagonal matrix that contains the singular values
-of the data matrix A, or the square roots of the eigenvalues of
-$A^{T}A$.
+\label{sec:sigma}
+The second output matrix of the numpy SVD function, $\Sigma$ is a
+pseudo-diagonal matrix that contains the singular values of the data
+matrix A, or the square roots of the eigenvalues of $A^{T}A$.
 
 \section{What to do next?}
 \label{sec:instructions}
@@ -225,7 +232,8 @@ approximation of the spectrum data.}
 \end{table}
 
 \subsection{Results Pt. II}
-\label{sec:results2} So, after talking to Gabe we found out that the
+\label{sec:results2}
+So, after talking to Gabe we found out that the
 functions we created were correct, but either weren't conducive to
 efficiency, or they simply weren't what he was looking for.  Whatever.
 So we're writing some functions that treat the process as calculating
@@ -260,7 +268,6 @@ after making some alterations to our code.
 
 Look in our unit testing document (unittesting.pdf) to see the process
 specifics.
-
 
 
 
