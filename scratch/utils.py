@@ -1,4 +1,4 @@
-"""reginergine"""
+"""There should be a description here..."""
 
 import numpy as np
 
@@ -10,8 +10,8 @@ def ratio(arr):
     
     # Figure out a way to make this work for non-integers...np.float
     # doesn't work
-    ratios = np.zeros((len(arr)-1,))
+    ratios = np.zeros((len(arr),))
     for i in range(len(arr)-1):
-        ratios[i-1] = (arr[i-1]/arr[i])
+        ratios[i] = (arr[i+1]/arr[i])
     return ratios[:-1]
 

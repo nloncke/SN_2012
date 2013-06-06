@@ -7,7 +7,7 @@
 \usepackage{amsmath}
 \usepackage{multicol}
 
-\newcommand{\mtx}[1]{\mathbf{#1}}
+\newcommand{\mtx}[1]{$\mathbf{#1}$}
 \newcommand{\defn}[1]{\textbf{#1}}
 
 \begin{document}
@@ -52,22 +52,18 @@ While effective, this brute-force method is inefficient. Using
 theoretical SN1a spectra as a testbed, we investigate whether
 supernova spectra can be well-represented as combinations of a much
 smaller number of basis spectra.  If so, we will see that the fitting
-step could be bypassed altogether.  Our talk will outline the proposed
-technique and our progress to date.
+step could be bypassed altogether.  Our paper will outline the
+proposed technique and our progress to date.
   
 \end{abstract}
 
 
-\section{Thought Processes}
-\label{sec:thinking}
-
-Recover a reasonably small basis for type1a supernova spectra.
 
 \vspace{5mm}
 
 % \begin{multicols}{2}
 
-  \subsection{A Toy Problem}
+  \section{A Toy Problem}
   \label{sec:hsiao}
   We decided to apply the same fundamental technique to a simpler
   problem.  Can we recover a basis set of functions for a single
@@ -82,7 +78,7 @@ Recover a reasonably small basis for type1a supernova spectra.
     of the supernova (?) and the days after peak brightness that
     produced these flux values.}
 
-  \subsection{PCA}
+  \section{PCA}
   \label{sec:pca}
 
   Thus far we have mentioned the notion of a basis for the spectra a
@@ -106,16 +102,104 @@ Recover a reasonably small basis for type1a supernova spectra.
   might we define a criterion for how many basis vectors we ought to
   include?
 
-  **Should probably mention SVD at some point so that I can talk about
-  the outputs**
-
   Back up, back up: SVD.  So PCA is actually based on a linear algebra
-  algorithm called \defn{Singular Value Decomposition}, or
-  \defn{SVD}.  We can think of it as the more general case of
-  orthogonal diagonalization, a process by which a square matrix is
-  factored into the product of three matrices 
+  algorithm called \defn{Singular Value Decomposition}, or \defn{SVD},
+  a process by which a square matrix is factored into the product of
+  three matrices---\mtx{U}, \mtx{\Sigma}, and \mtx{V^{T}}.
+  
+  In a purely linear algebraic sense, performing SVD on a matrix
+  \mtx{A} yields
+  
+  \begin{itemize}
+  \item \mtx{U}, the matrix whose columns are the eigenvectors of
+    \mtx{AA^{T}}, and therefore form a basis for the space spanned by
+    \mtx{AA^{T}};
+  \item \mtx{\Sigma}, the diagonal matrix whose entries are the
+    singular values of \mtx{A}---the square root of the eigenvalues
+    of \mtx{A^{T}A}---in decreasing order;
+  \item \mtx{V}, the matrix whose columns are the eigenvectors of
+    \mtx{A^{T}A}.
+  \end{itemize}
 
-  Singular values
+  In terms of our problem, the singular values indicate the variance
+  of the data represented along the direction of the basis vectors in
+  \mtx{V}.  Because SVD presents us with this ranking system, so to
+  speak, we can easily label each of the eigenvectors in \mtx{V} as
+  being the first, second, etc. principal components of our data.
+
+% AHHHH!!!! TALKING ABOUT PCA EEEZ MUY DIFICIL.
+
+
+\section{Partial Sums}
+\label{sec:recons}
+
+Here's the part where I talk about how we came up with the N$^{th}$
+order partial sums of the spectra.  It's kind of an appendage of the
+PCA section, so I might make it a subsection, but I'm slowly
+realizing that everything I talk about falls under the PCA section,
+so\dots yeah.  I'll fix that later.
+
+% I also realize that I need to review why multiplying \mtx{U} and
+% \mtx{\Sigma} gives us the coefficients for the principal components.
+% (Forgetting why we did certain things is normal but unacceptable, I
+% know, so I have to get on that \emph{asap}.)
+
+
+\section{Rethinking Residuals}
+\label{sec:residuals}
+
+In short, we used PCA to project the spectral data onto eigenspaces of
+varying dimensions, depending on how many basis vectors from the
+singular value decomposition we included.  Once we had accomplished
+this, we began inspecting the spectra across different epochs for
+varying values of N, where N is the number of principal components
+used.
+
+We found that using 25 principal components provided a nearly-perfect
+visual reconstruction of the supernova spectra across all the epochs.
+However, inspecting the residuals, which we calculated as a regular
+percent error, revealed surprisingly large values, given the spectra
+we were looking at.  Exhaustive unit testing confirmed that the
+abnormally high values were not due to any bugs in our modules; we
+must have defined our residuals inappropriately.
+
+After considering the possibility that our residuals could be
+``wrong,'' we realized that because our flux values for any given day
+were fairly small---the most extreme being on the order of
+$10^{-38}$---division by such numbers would yield misleading answers
+about the correctness of our approximations.  If the flux data were
+truly the root of our residual issues, then scaling them to manangable
+values before performing PCA would provide a solution to our problem.
+
+Rather than just multiplying all the data by a scalar, we decided to
+manipulate the ``amplitude'' of each spectrum.  We defined the
+amplitude of a spectrum to be the difference between its maximum and
+minimum flux values.  This max-min difference is what we normalized to
+be equal to 2, similarly to the max-min difference of a standard
+sinusoidal function.
+
+In addition to scaling all the spectra, we also decided to zero-mean
+them.  This entailed doing exactly what it sounds like---we subtracted
+the mean of the flux values for a given day from every flux value for
+that day.  Graphically, this action is equivalent to shifting the
+spectrum up or down so that the signed area under the curve is 0, or
+equivalently,
+
+\vspace{2.5mm}
+
+% Just experimenting with texing integrals.  Feel free to ignore the following.
+\begin{math}
+  \int f(\lambda)d\lambda
+\end{math}.
+
+With spectra that are centered around zero and of unit amplitude,
+our computations should be less susceptible to roundoff error and our
+residuals should no longer reflect the issue of dividing by very small
+numbers.  Instead of computing the difference between the original
+spectra and the $N^{th}$ order reconstruction of the spectra and then
+dividing by the original to obtain our residuals, we now take the
+difference between the reconstructions and the original, and then
+divide by half of the max-min difference, which is simply 1.
 
 
 
@@ -124,27 +208,34 @@ Recover a reasonably small basis for type1a supernova spectra.
 
 
 
-\section{Methodology}
-\label{sec:procedure}
+% \section{Methodology}
+% \label{sec:procedure}
 
-\begin{enumerate}
-\item Rip the spectral data from Eric Hsiao's data template.
-\item Normalize the ``amplitude'' of each specrtum.
-\item Center the spectrum around zero, or \emph{whiten} the spectral
-  data matrix by rows.
-\item Apply SVD to the data matrix and combine the outputs to yield a
-  matrix of basis vectors and coefficients for said basis vectors.
-\item Regenerate the data matrix using the coefficient and basis
-  vector matrices using up to $N$ basis vectors each time for $N = \#
-  of samples$.
-\item C
-\end{enumerate}
+% \begin{enumerate}
+% \item Rip the spectral data from Eric Hsiao's data template.
+% \item Normalize the ``amplitude'' of each specrtum.
+% \item Center the spectrum around zero, or \emph{whiten} the spectral
+%   data matrix by rows.
+% \item Apply SVD to the data matrix and combine the outputs to yield a
+%   matrix of basis vectors and coefficients for said basis vectors.
+% \item Regenerate the data matrix using the coefficient and basis
+%   vector matrices using up to $N$ basis vectors each time for $N = \#
+%   of samples$.
+% \item C
+% \end{enumerate}
 
 
 
 \section{Conclusions}
 \label{sec:conclusions}
 
-Here's the part where we talk about what we found.
+Based on our progress to date, we are on the verge of resolving our
+ultimate question on a small scale.  Ultimately, we would like to
+uncover a reasonably small basis for type1a supernova spectra.
+Although we are far from acheiving this goal, our work this summer has
+trained us in the necessary technique of PCA, which we will eventually
+use to tackle the larger problem of finding commonality amongst the
+spectra of various supernovae, rather than within a template of
+stretch 1.
 
 \end{document}
